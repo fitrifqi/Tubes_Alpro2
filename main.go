@@ -16,6 +16,8 @@ func main() {
 	var d tabData
 	var n int = 0
 
+	isiData(&d, &n)
+
 	fmt.Printf("Welcome\n")
 	fmt.Printf("FEATURES :\n")
 	fmt.Printf("A. Edit\nB. Search\nC. Sort\nD. Show Statistics\nE. Stop\n")
@@ -51,14 +53,16 @@ func main() {
 			fmt.Scan(&search)
 			searchData(search)
 		case "C":
-			fmt.Printf("Sort by :\nA. Highest Energy Consumption\nB. Alphabetical Order\nC.Back\nOption : ")
+			callMenu(2)
 			for c2 != "C" {
 				fmt.Scan(&c2)
 				switch c2 {
 				case "A":
-					sortEnergy()
+					sortEnergy(&d, n)
+					callMenu(2)
 				case "B":
 					sortAlphabetical()
+					callMenu(2)
 				case "C":
 					fmt.Printf("A. Edit\nB. Search\nC. Sort\nD. Show Statistics\nE. Stop\nOption : ")
 				default:
@@ -77,11 +81,20 @@ func main() {
 	}
 }
 
+func isiData(d *tabData, n *int) {
+	*d[0].name = "Rice_Cooker"
+	*d[0].room = "Kitchen"
+	*d[0].watt = 360
+	*d[0].time = 720
+}
+
 func callMenu(menu int) {
 	if menu == 0 {
 		fmt.Printf("\nA. Edit\nB. Search\nC. Sort\nD. Show Statistics\nE. Stop\n")
 	} else if menu == 1 {
 		fmt.Printf("EDIT :\nA. Add Data\nB. Change Data\nC. Delete Data\nD. Back\nOption : ")
+	} else if menu == 2 {
+		fmt.Printf("Sort by :\nA. Highest Energy Consumption\nB. Alphabetical Order\nC. Back\nOption : ")
 	}
 }
 
@@ -99,7 +112,7 @@ func addData(d *tabData, n *int) {
 
 func changeData(d *tabData, n int) {
 	fmt.Println("Which data do you want you change?")
-	showData(*d,n)
+	showData(*d, n)
 	var s string
 	fmt.Scan(&s)
 	searchData(s)
@@ -126,8 +139,25 @@ func deleteData(d *tabData, n *int) {
 func searchData(s string) {
 	fmt.Print(s)
 }
-func sortEnergy() {
-	fmt.Printf("Data Sorted! (Energy)")
+func sortEnergy(d *tabData, n int) {
+	var idx int
+	var t data
+	i := 1
+	for i <= n-1 {
+		idx = i - 1
+		j := i
+		for j < n {
+			if d[idx].watt < d[j].watt {
+				idx = j
+			}
+			j = j + 1
+		}
+		t = d[idx]
+		d[idx] = d[i-1]
+		d[i-1] = t
+		i = i + 1
+	}
+
 }
 
 func sortAlphabetical() {

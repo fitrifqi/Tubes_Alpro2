@@ -66,7 +66,7 @@ func main() {
 				}
 			}
 		case "D":
-			showData(&d, &n)
+			showData(d, n)
 			callMenu(0)
 			fmt.Printf("Option : ")
 		case "E":
@@ -98,6 +98,12 @@ func addData(d *tabData, n *int) {
 }
 
 func changeData(d *tabData, n int) {
+	fmt.Println("Which data do you want you change?")
+	showData(*d,n)
+	var s string
+	fmt.Scan(&s)
+	searchData(s)
+
 	fmt.Printf("Data Changed!")
 }
 
@@ -107,7 +113,7 @@ func deleteData(d *tabData, n *int) {
 	case *n <= 0:
 		fmt.Printf("Data still empty!")
 	default:
-		showData(d, n)
+		showData(*d, *n)
 		fmt.Printf("Which number to delete : ")
 		fmt.Scan(&x)
 		for i := x - 1; i < *n; i++ {
@@ -128,9 +134,9 @@ func sortAlphabetical() {
 	fmt.Printf("Data Sorted Alphabetically!")
 }
 
-func showData(d *tabData, n *int) {
+func showData(d tabData, n int) {
 	fmt.Printf("No | %-16s | %-16s | Power | Duration\n", "Name", "Room")
-	for i := 0; i < *n; i++ {
+	for i := 0; i < n; i++ {
 		fmt.Printf("%-3d| %-16s | %-16s | %-5d | %-5d\n", i+1, d[i].name, d[i].room, d[i].watt, d[i].time)
 	}
 }

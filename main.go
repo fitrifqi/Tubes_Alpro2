@@ -82,11 +82,18 @@ func main() {
 }
 
 func isiData(d *tabData, n *int) {
+<<<<<<< HEAD
 	d[0].name = "Rice_Cooker"
 	d[0].room = "Kitchen"
 	d[0].watt = 360
 	d[0].time = 720
 	*n++
+=======
+	*d[0].name = "Rice_Cooker"
+	*d[0].room = "Kitchen"
+	*d[0].watt = 360
+	*d[0].time = 720
+>>>>>>> d47dbef4c59c35d116262b539a2bb83c87a8cc2a
 }
 
 func callMenu(menu int) {

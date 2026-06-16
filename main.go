@@ -12,7 +12,7 @@ type data struct {
 type tabData [NMAX]data
 
 func main() {
-	var c1, c2, search string
+	var c1, c2, c3, search string
 	var d tabData
 	var n int = 0
 
@@ -49,6 +49,10 @@ func main() {
 		case "B":
 			fmt.Printf("Search by:\nA. Name\nB. Room\nOption : ")
 			fmt.Scan(&c2)
+			for c2 != "A" && c2 != "B" {
+				fmt.Printf("Option doesnt exists. Please re-enter option : ")
+				fmt.Scan(&c2)
+			}
 			fmt.Printf("Search for: ")
 			fmt.Scan(&search)
 			if c2 == "A" {
@@ -65,9 +69,25 @@ func main() {
 				switch c2 {
 				case "A":
 					sortEnergy(&d, n)
+					showData(d, n)
+					fmt.Println("Data Sorted!")
+					callMenu(3)
 					callMenu(2)
 				case "B":
-					sortAlphabeticalName(&d, n)
+					fmt.Printf("Sort Data by\nA. Room\nB. Name\nOption : ")
+					fmt.Scan(&c3)
+					for c3 != "A" && c3 != "B" {
+						fmt.Printf("Option doesnt exists. Please re-enter option : ")
+						fmt.Scan(&c3)
+					}
+					if c3 == "A" {
+						sortAlphabeticalName(&d, n)
+					} else {
+						sortAlphabeticalRoom(&d, n)
+					}
+					showData(d, n)
+					fmt.Println("Data Sorted!")
+					callMenu(3)
 					callMenu(2)
 				case "C":
 					fmt.Printf("A. Edit\nB. Search\nC. Sort\nD. Show Statistics\nE. Stop\nOption : ")
@@ -207,43 +227,40 @@ func deleteData(d *tabData, n *int) {
 
 //Searchs Data By Name
 func searchDataByName(s string, d tabData, n int) {
-	var ketemu data
-	ketemu.name = "Belum"
-	for i := 0; i < n; i++ {
-		if d[i].name == s {
-			ketemu = d[i]
-		}
-	}
-	if ketemu.name == "Belum" {
-		fmt.Println("Data not found!")
-	} else {
-		printSingles(ketemu)
-	}
-}
-
-//Searchs Data By Room
-func searchDataByRoom(s string, d tabData, n int) {
-	sortAlphabeticalRoom(&d, n)
-	var l, r, mid, ketemu int
+	sortAlphabeticalName(&d, n)
+	var ketemu int
 	ketemu = -1
-	l = 0
-	r = n - 1
+	var l, r, mid int
 	for l <= r {
 		mid = (l + r) / 2
-		if d[mid].room == s {
+		if d[mid].name == s {
 			ketemu = mid
 		}
-		if d[mid].room < s {
-			l = mid + 1
+		if d[mid].name < s {
+			r = mid + 1
 		}
-		if d[mid].room > s {
-			r = mid - 1
+		if d[mid].name > s {
+			l = mid - 1
 		}
 	}
 	if ketemu == -1 {
 		fmt.Println("Data not found!")
 	} else {
-		printSingles(d[ketemu])
+		fmt.Printf("No | %-16s | %-16s | Power | Duration (in minutes)\n", "Name", "Room")
+		printSingles(d[ketemu], 1)
+	}
+}
+
+//Searchs Data By Room
+func searchDataByRoom(s string, d tabData, n int) {
+	fmt.Println("Data in Room ", s)
+	var idx int = 1
+	fmt.Printf("No | %-16s | %-16s | Power | Duration (in minutes)\n", "Name", "Room")
+	for i := 0; i < n; i++ {
+		if d[i].name == s {
+			printSingles(d[i], idx)
+			idx++
+		}
 	}
 }
 
@@ -266,7 +283,6 @@ func sortEnergy(d *tabData, n int) {
 		d[i-1] = t
 		i = i + 1
 	}
-
 }
 
 //sorts data lexicographically by room
@@ -293,7 +309,7 @@ func sortAlphabeticalName(d *tabData, n int) {
 	for i := 0; i < n-1; i++ {
 		idx_min = i
 		for j := i + 1; j < n; j++ {
-			if d[j].name > d[idx_min].name {
+			if d[j].name < d[idx_min].name {
 				idx_min = j
 			}
 		}
@@ -312,11 +328,8 @@ func showData(d tabData, n int) {
 }
 
 //Printing a single data instead of the whole array
-func printSingles(a data) {
-	fmt.Println("Name : ", a.name)
-	fmt.Println("Room : ", a.room)
-	fmt.Println("Power : ", a.watt)
-	fmt.Println("Duration (in minutes) : ", a.time)
+func printSingles(a data, i int) {
+	fmt.Printf("%-3d| %-16s | %-16s | %-5d | %-5d\n", i+1, a.name, a.room, a.watt, a.time)
 }
 
 func showStatistics(d tabData, n int) {

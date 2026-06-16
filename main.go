@@ -207,8 +207,8 @@ func addData(d *tabData, n *int) {
 
 //Replaces Data
 func changeData(d *tabData, n int) {
-	fmt.Println("Which data do you want you change?")
 	showData(*d, n)
+	fmt.Println("Which data do you want you change?")
 	var s string
 	fmt.Scan(&s)
 	ketemu := searchDataByName(s, d, n)

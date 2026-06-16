@@ -27,6 +27,7 @@ func main() {
 		fmt.Scan(&c1)
 		switch c1 {
 		case "A":
+			c2 = ""
 			fmt.Printf("EDIT :\nA. Add Data\nB. Change Data\nC. Delete Data\nD. Back\nOption : ")
 			for c2 != "D" {
 				fmt.Scan(&c2)
@@ -47,6 +48,7 @@ func main() {
 				}
 			}
 		case "B":
+			c2 = ""
 			fmt.Printf("Search by:\nA. Name\nB. Room\nOption : ")
 			fmt.Scan(&c2)
 			for c2 != "A" && c2 != "B" {
@@ -56,19 +58,26 @@ func main() {
 			fmt.Printf("Search for: ")
 			fmt.Scan(&search)
 			if c2 == "A" {
-				searchDataByName(search, d, n)
+				ketemu := searchDataByName(search, &d, n)
+				if ketemu != -1 {
+					fmt.Printf("No | %-16s | %-16s | Power | Duration (in minutes)\n", "Name", "Room")
+					printSingles(d[ketemu], 0)
+				} else {
+					fmt.Println("Data not found!")
+				}
 			} else {
 				searchDataByRoom(search, d, n)
 			}
 			callMenu(3)
 			callMenu(0)
 		case "C":
+			c2 = ""
 			callMenu(2)
 			for c2 != "C" {
 				fmt.Scan(&c2)
 				switch c2 {
 				case "A":
-					sortEnergy(&d, n)
+					sortWatt(&d, n)
 					showData(d, n)
 					fmt.Println("Data Sorted!")
 					callMenu(3)
@@ -81,9 +90,9 @@ func main() {
 						fmt.Scan(&c3)
 					}
 					if c3 == "A" {
-						sortAlphabeticalName(&d, n)
-					} else {
 						sortAlphabeticalRoom(&d, n)
+					} else {
+						sortAlphabeticalName(&d, n)
 					}
 					showData(d, n)
 					fmt.Println("Data Sorted!")
@@ -100,7 +109,6 @@ func main() {
 			showStatistics(d, n)
 			callMenu(3)
 			callMenu(0)
-			fmt.Printf("Option : ")
 		case "E":
 			fmt.Printf("Goodbye!")
 		default:
@@ -170,20 +178,20 @@ func callMenu(menu int) {
 	} else if menu == 1 {
 		fmt.Printf("EDIT :\nA. Add Data\nB. Change Data\nC. Delete Data\nD. Back\nOption : ")
 	} else if menu == 2 {
-		fmt.Printf("Sort by :\nA. Highest Energy Consumption\nB. Alphabetical Order\nC. Back\nOption : ")
+		fmt.Printf("Sort by :\nA. Highest Watt Consumption\nB. Alphabetical Order\nC. Back\nOption : ")
 	} else if menu == 3 {
 		var s string
 		fmt.Print("Type Any to Go Back : ")
 		fmt.Scan(&s)
-		for s == " " {
-			fmt.Print("Option Invalid. Type Any to Go Back : ")
-			fmt.Scan(&s)
-		}
 	}
 }
 
 //Adds New Data Input
 func addData(d *tabData, n *int) {
+	if *n >= NMAX {
+		fmt.Println("Database full!")
+		return
+	}
 	fmt.Printf("Device name: ")
 	fmt.Scan(&d[*n].name)
 	fmt.Printf("Location: ")
@@ -203,8 +211,21 @@ func changeData(d *tabData, n int) {
 	showData(*d, n)
 	var s string
 	fmt.Scan(&s)
-	searchDataByName(s, *d, n)
-	fmt.Println("Data Changed!")
+	ketemu := searchDataByName(s, d, n)
+	if ketemu != -1 {
+		fmt.Println("Enter data that you want to change it to : ")
+		fmt.Printf("Name : ")
+		fmt.Scan(&d[ketemu].name)
+		fmt.Printf("Room : ")
+		fmt.Scan(&d[ketemu].room)
+		fmt.Printf("Power : ")
+		fmt.Scan(&d[ketemu].watt)
+		fmt.Printf("Duration (in minutes) : ")
+		fmt.Scan(&d[ketemu].time)
+		fmt.Println("Data Changed!")
+	} else {
+		fmt.Println("Data not found!")
+	}
 	callMenu(3)
 }
 
@@ -218,54 +239,56 @@ func deleteData(d *tabData, n *int) {
 		showData(*d, *n)
 		fmt.Printf("Which number to delete : ")
 		fmt.Scan(&x)
-		for i := x - 1; i < *n; i++ {
+		if x < 1 || x > *n {
+			fmt.Println("Invalid index!")
+			return
+		}
+		for i := x - 1; i < *n-1; i++ {
 			d[i] = d[i+1]
 		}
 		*n--
+		fmt.Println("Data Deleted!")
 	}
+
 }
 
 //Searchs Data By Name
-func searchDataByName(s string, d tabData, n int) {
-	sortAlphabeticalName(&d, n)
-	var ketemu int
-	ketemu = -1
+func searchDataByName(s string, d *tabData, n int) int {
+	sortAlphabeticalName(d, n)
 	var l, r, mid int
+	l = 0
+	r = n - 1
 	for l <= r {
 		mid = (l + r) / 2
 		if d[mid].name == s {
-			ketemu = mid
-		}
-		if d[mid].name < s {
-			r = mid + 1
-		}
-		if d[mid].name > s {
-			l = mid - 1
+			return mid
+		} else if d[mid].name < s {
+			l = mid + 1
+		} else {
+			r = mid - 1
 		}
 	}
-	if ketemu == -1 {
-		fmt.Println("Data not found!")
-	} else {
-		fmt.Printf("No | %-16s | %-16s | Power | Duration (in minutes)\n", "Name", "Room")
-		printSingles(d[ketemu], 1)
-	}
+	return -1
 }
 
 //Searchs Data By Room
 func searchDataByRoom(s string, d tabData, n int) {
 	fmt.Println("Data in Room ", s)
-	var idx int = 1
+	var idx int = 0
 	fmt.Printf("No | %-16s | %-16s | Power | Duration (in minutes)\n", "Name", "Room")
 	for i := 0; i < n; i++ {
-		if d[i].name == s {
+		if d[i].room == s {
 			printSingles(d[i], idx)
 			idx++
 		}
 	}
+	if idx == 0 {
+		fmt.Println("No devices found in this room.")
+	}
 }
 
 //sorts data Ascending by Usage
-func sortEnergy(d *tabData, n int) {
+func sortWatt(d *tabData, n int) {
 	var idx int
 	var t data
 	i := 1
@@ -292,7 +315,7 @@ func sortAlphabeticalRoom(d *tabData, n int) {
 	for i := 0; i < n-1; i++ {
 		idx_min = i
 		for j := i + 1; j < n; j++ {
-			if d[j].room > d[idx_min].room {
+			if d[j].room < d[idx_min].room {
 				idx_min = j
 			}
 		}
@@ -333,11 +356,17 @@ func printSingles(a data, i int) {
 }
 
 func showStatistics(d tabData, n int) {
+	if n == 0 {
+		fmt.Println("No data available!")
+		return
+	}
 	var total, total1 int
 	for i := 0; i < n; i++ {
 		total += d[i].time
-		total1 += d[i].watt
+		total1 += d[i].watt * d[i].time
 	}
-	fmt.Println("Average Usage Time :", total)
-	fmt.Println("Average Energy Consumed :", total1)
+	fmt.Println("Total Energy Consumed :", total1)
+	fmt.Println("Total Usage Time :", total)
+	fmt.Println("Average Usage Time :", float64(total)/float64(n))
+	fmt.Println("Average Energy Consumed :", float64(total1)/float64(n))
 }

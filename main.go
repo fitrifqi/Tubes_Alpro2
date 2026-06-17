@@ -360,8 +360,11 @@ func showStatistics(d tabData, n int) {
 		fmt.Println("No data available!")
 		return
 	}
-	var total, total1 int
+	var total, total1, besar int
 	for i := 0; i < n; i++ {
+		if i == 0 || (besar < (d[i].watt * d[i].time)) {
+			besar = d[i].watt * d[i].time
+		}
 		total += d[i].time
 		total1 += d[i].watt * d[i].time
 	}
@@ -369,4 +372,5 @@ func showStatistics(d tabData, n int) {
 	fmt.Println("Total Usage Time :", total)
 	fmt.Println("Average Usage Time :", float64(total)/float64(n))
 	fmt.Println("Average Energy Consumed :", float64(total1)/float64(n))
+	fmt.Println("Device with Most Energy Consumed : ", besar)
 }
